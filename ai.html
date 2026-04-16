@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surf Dodge | Caleb Cooper</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #0b2a45, #1f5c7a, #8ecae6);
+            color: white;
+            text-align: center;
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            margin-bottom: 18px;
+            color: #e6f7ff;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.14);
+            padding: 10px 18px;
+            border-radius: 10px;
+            min-width: 110px;
+            font-weight: bold;
+        }
+
+        #game {
+            width: 360px;
+            height: 560px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid white;
+            border-radius: 18px;
+            background: linear-gradient(to bottom, #52b7ff 0%, #2a9df4 45%, #1572b6 100%);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+
+        .lane-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: rgba(255,255,255,0.25);
+        }
+
+        .lane1 { left: 120px; }
+        .lane2 { left: 240px; }
+
+        #player {
+            width: 70px;
+            height: 70px;
+            position: absolute;
+            bottom: 20px;
+            left: 145px;
+            font-size: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.08s linear;
+        }
+
+        .rock {
+            width: 62px;
+            height: 62px;
+            position: absolute;
+            top: -70px;
+            font-size: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls {
+            margin-top: 18px;
+        }
+
+        button {
+            background: #ffd166;
+            color: #0b2a45;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            opacity: 0.92;
+        }
+
+        .instructions {
+            max-width: 650px;
+            margin: 20px auto 0;
+            line-height: 1.6;
+            color: #eef9ff;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        #game-over {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 1.3rem;
+            z-index: 10;
+        }
+
+        #game-over h2 {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 500px) {
+            #game {
+                width: 300px;
+                height: 500px;
+            }
+
+            .lane1 { left: 100px; }
+            .lane2 { left: 200px; }
+
+            #player {
+                left: 115px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1>Surf Dodge</h1>
+        <p class="subtitle">Avoid the rocks, stay on your board, and survive as long as you can.</p>
+
+        <div class="top-bar">
+            <div class="stat">Score: <span id="score">0</span></div>
+            <div class="stat">Best: <span id="best">0</span></div>
+            <div class="stat">Speed: <span id="speed">1</span></div>
+        </div>
+
+        <div id="game">
+            <div class="lane-line lane1"></div>
+            <div class="lane-line lane2"></div>
+
+            <div id="player">🏄‍♂️</div>
+
+            <div id="game-over">
+                <h2>Wipeout</h2>
+                <p>Your board hit a rock.</p>
+                <button onclick="startGame()">Play Again</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="moveLeft()">⬅ Move Left</button>
+            <button onclick="moveRight()">Move Right ➡</button>
+            <button onclick="startGame()">Restart</button>
+        </div>
+
+        <div class="instructions">
+            <p>Use the arrow keys or the buttons to move between lanes.</p>
+            <p>Each rock you dodge gives you a point. The game speeds up as your score rises.</p>
+        </div>
+
+       <a class="back-link" href="index.html">← Back to Home</a>
+    </div>
+
+    <script>
+        const lanes = [25, 145, 265];
+        let playerLane = 1;
+        let rocks = [];
+        let score = 0;
+        let best = 0;
+        let gameRunning = false;
+        let rockSpeed = 3;
+        let spawnRate = 1100;
+        let spawnInterval;
+        let animationFrame;
+
+        const game = document.getElementById("game");
+        const player = document.getElementById("player");
+        const scoreEl = document.getElementById("score");
+        const bestEl = document.getElementById("best");
+        const speedEl = document.getElementById("speed");
+        const gameOverBox = document.getElementById("game-over");
+
+        function updatePlayerPosition() {
+            player.style.left = lanes[playerLane] + "px";
+        }
+
+        function moveLeft() {
+            if (!gameRunning) return;
+            if (playerLane > 0) {
+                playerLane--;
+                updatePlayerPosition();
+            }
+        }
+
+        function moveRight() {
+            if (!gameRunning) return;
+            if (playerLane < 2) {
+                playerLane++;
+                updatePlayerPosition();
+            }
+        }
+
+        function createRock() {
+            if (!gameRunning) return;
+
+            const rock = document.createElement("div");
+            rock.classList.add("rock");
+
+            const lane = Math.floor(Math.random() * 3);
+            rock.dataset.lane = lane;
+            rock.style.left = lanes[lane] + 4 + "px";
+            rock.style.top = "-70px";
+            rock.textContent = "🪨";
+
+            game.appendChild(rock);
+            rocks.push(rock);
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+
+            for (let i = rocks.length - 1; i >= 0; i--) {
+                const rock = rocks[i];
+                let currentTop = parseFloat(rock.style.top);
+                currentTop += rockSpeed;
+                rock.style.top = currentTop + "px";
+
+                if (currentTop > 460 && currentTop < 530 && parseInt(rock.dataset.lane) === playerLane) {
+                    endGame();
+                    return;
+                }
+
+                if (currentTop > 560) {
+                    rock.remove();
+                    rocks.splice(i, 1);
+                    score++;
+                    scoreEl.textContent = score;
+
+                    rockSpeed = 3 + Math.floor(score / 5) * 0.5;
+                    speedEl.textContent = (1 + Math.floor(score / 5));
+
+                    if (score > best) {
+                        best = score;
+                        bestEl.textContent = best;
+                    }
+                }
+            }
+
+            animationFrame = requestAnimationFrame(updateGame);
+        }
+
+        function clearRocks() {
+            rocks.forEach(rock => rock.remove());
+            rocks = [];
+        }
+
+        function startGame() {
+            clearInterval(spawnInterval);
+            cancelAnimationFrame(animationFrame);
+            clearRocks();
+
+            score = 0;
+            rockSpeed = 3;
+            spawnRate = 1100;
+            playerLane = 1;
+            updatePlayerPosition();
+
+            scoreEl.textContent = "0";
+            speedEl.textContent = "1";
+            bestEl.textContent = best;
+            gameOverBox.style.display = "none";
+
+            gameRunning = true;
+
+            spawnInterval = setInterval(() => {
+                createRock();
+
+                if (score > 0 && score % 8 === 0 && spawnRate > 650) {
+                    spawnRate -= 10;
+                }
+            }, 900);
+
+            updateGame();
+        }
+
+        function endGame() {
+            gameRunning = false;
+            clearInterval(spawnInterval);
+            cancelAnimationFrame(animationFrame);
+            gameOverBox.style.display = "flex";
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "ArrowLeft") moveLeft();
+            if (event.key === "ArrowRight") moveRight();
+        });
+
+        updatePlayerPosition();
+        startGame();
+    </script>
+</body>
+</html>
