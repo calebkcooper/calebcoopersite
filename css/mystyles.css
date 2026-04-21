@@ -1,0 +1,124 @@
+/* ===== GLOBAL STYLE ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f7f7f5;
+    color: #2c2c2c;
+}
+
+/* ===== NAV ===== */
+.scratch-nav {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.scratch-nav h2 {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.scratch-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.scratch-nav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+}
+
+.scratch-nav a:hover {
+    color: #c49a6c;
+}
+
+.hero {
+    text-align: center;
+    padding: 120px 20px;
+    color: white;
+    position: relative;
+}
+
+/* DARK OVERLAY (this is the key) */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3); /* increase darkness */
+}
+
+/* keep text above overlay */
+.hero h1,
+.hero p,
+.hero-links {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== SECTION ===== */
+section {
+    max-width: 800px;
+    margin: auto;
+    padding: 60px 20px;
+}
+
+/* ===== HEADINGS ===== */
+h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* ===== IMAGE STYLE ===== */
+.surf-img {
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 25px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+}
+
+/* ===== LIST STYLE ===== */
+ol {
+    padding-left: 20px;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+/* ===== VIDEO ===== */
+iframe {
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+/* ===== TABLEAU ===== */
+.tableau-block {
+    text-align: center;
+}
+
+/* ===== FOOTER ===== */
+footer {
+    background: #f0f0ed;
+    padding: 30px;
+    text-align: center;
+    margin-top: 50px;
+    font-size: 0.9rem;
+}
+
+footer a {
+    color: #333;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #c49a6c;
+}
