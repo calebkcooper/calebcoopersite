@@ -122,3 +122,16 @@ footer a {
 footer a:hover {
     color: #c49a6c;
 }
+/* Fix link colors */
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:visited {
+  color: white;
+}
+
+a:hover {
+  color: #00cfff; /* nice light blue hover */
+}
