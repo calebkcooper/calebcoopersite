@@ -37,6 +37,7 @@ body {
     color: #c49a6c;
 }
 
+/* ===== HERO ===== */
 .hero {
     text-align: center;
     padding: 120px 20px;
@@ -44,12 +45,12 @@ body {
     position: relative;
 }
 
-/* DARK OVERLAY (this is the key) */
+/* DARK OVERLAY */
 .hero::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3); /* increase darkness */
+    background: rgba(0, 0, 0, 0.3);
 }
 
 /* keep text above overlay */
@@ -58,6 +59,28 @@ body {
 .hero-links {
     position: relative;
     z-index: 1;
+}
+
+/* (only these links change color) */
+.hero-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 0 15px;
+    transition: 0.3s;
+}
+
+.hero-links a:visited {
+    color: white;
+}
+
+.hero-links a:hover {
+    color: #00cfff;
+}
+
+/* spacing */
+.hero-links {
+    margin-top: 20px;
 }
 
 /* ===== SECTION ===== */
@@ -121,17 +144,4 @@ footer a {
 
 footer a:hover {
     color: #c49a6c;
-}
-/* Fix link colors */
-a {
-  color: white;
-  text-decoration: none;
-}
-
-a:visited {
-  color: white;
-}
-
-a:hover {
-  color: #00cfff; /* nice light blue hover */
 }
